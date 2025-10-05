@@ -15,16 +15,39 @@ namespace gsoft.Datos
         {
             string resp = "";
             string claveHash = Seguridad.HashSHA256(oUsuario.Clave);
-            string Insert = "INSERT INTO usuario (nombre, usuario, clave) VALUES ('" + oUsuario.Nombre + "','" + oUsuario.Usuario + "','" + claveHash + "')";
             NpgsqlConnection SqlCon = new NpgsqlConnection();
 
             try
             {
                 SqlCon = Conexion.getInstancia().CrearConexion();
-                NpgsqlCommand Comando = new NpgsqlCommand(Insert, SqlCon);
-                Comando.CommandType = CommandType.Text;
                 SqlCon.Open();
-                resp = Comando.ExecuteNonQuery() >= 1 ? "OK" : "No se pudo registrar el usuario";
+
+                // 1. Buscar el ID del rol "Estandar"
+                string queryRol = "SELECT id FROM rol WHERE nombre = 'Estandar' LIMIT 1";
+                NpgsqlCommand cmdRol = new NpgsqlCommand(queryRol, SqlCon);
+                object rolIdObj = cmdRol.ExecuteScalar();
+
+                if (rolIdObj == null)
+                {
+                    resp = "No se encontró el rol 'Estandar'";
+                }
+                else
+                {
+                    Guid rolId = (Guid)rolIdObj;
+
+                    // 2. Insertar el usuario con el rol_id
+                    string Insert = "INSERT INTO usuario (nombre, usuario, clave, rol_id) " +
+                                    "VALUES (@nombre, @usuario, @clave, @rol_id)";
+
+                    NpgsqlCommand Comando = new NpgsqlCommand(Insert, SqlCon);
+                    Comando.CommandType = CommandType.Text;
+                    Comando.Parameters.AddWithValue("@nombre", oUsuario.Nombre);
+                    Comando.Parameters.AddWithValue("@usuario", oUsuario.Usuario);
+                    Comando.Parameters.AddWithValue("@clave", claveHash);
+                    Comando.Parameters.AddWithValue("@rol_id", rolId);
+
+                    resp = Comando.ExecuteNonQuery() >= 1 ? "OK" : "No se pudo registrar el usuario";
+                }
             }
             catch (Exception ex)
             {
@@ -32,7 +55,6 @@ namespace gsoft.Datos
             }
             finally
             {
-                //if (SqlCon.State == System.Data.ConnectionState.Open) SqlCon.Close();
                 if (SqlCon.State == ConnectionState.Open) SqlCon.Close();
             }
 
@@ -79,5 +101,36 @@ namespace gsoft.Datos
             return oUsuario; // Si es null, el login falló
         }
 
+        public DataTable ListarUsuarios(string busqueda)
+        {
+            NpgsqlDataReader Resultado;
+            DataTable Tabla = new DataTable();
+            NpgsqlConnection SqlCon = new NpgsqlConnection();
+            try
+            {
+                string query = "SELECT u.id as Id, u.nombre as Nombre, u.usuario AS Usuario, r.nombre AS Rol, r.id AS RolId FROM usuario u INNER JOIN rol r WHERE u.status=true";
+                if (!string.IsNullOrEmpty(busqueda))
+                {
+                    query += " AND u.nombre ILIKE '%" + busqueda + "%'";
+                }
+                SqlCon = Conexion.getInstancia().CrearConexion();
+                NpgsqlCommand Comando = new NpgsqlCommand(query, SqlCon);
+                Comando.CommandType = CommandType.Text;
+                SqlCon.Open();
+                Resultado = Comando.ExecuteReader();
+                Tabla.Load(Resultado);
+                return Tabla;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open) SqlCon.Close();
+            }
+        }
+
     }
+
 }
