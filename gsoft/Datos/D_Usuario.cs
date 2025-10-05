@@ -108,7 +108,7 @@ namespace gsoft.Datos
             NpgsqlConnection SqlCon = new NpgsqlConnection();
             try
             {
-                string query = "SELECT u.id as Id, u.nombre as Nombre, u.usuario AS Usuario, r.nombre AS Rol, r.id AS RolId FROM usuario u INNER JOIN rol r WHERE u.status=true";
+                string query = "SELECT u.id as Id, u.nombre as Nombre, u.usuario AS Usuario, r.nombre AS Rol, r.id AS RolId FROM usuario u INNER JOIN rol r ON u.rol_id = r.id WHERE u.status=true";
                 if (!string.IsNullOrEmpty(busqueda))
                 {
                     query += " AND u.nombre ILIKE '%" + busqueda + "%'";
@@ -129,6 +129,100 @@ namespace gsoft.Datos
             {
                 if (SqlCon.State == ConnectionState.Open) SqlCon.Close();
             }
+        }
+
+        public string CrearUsuario(E_Usuario oUsuario)
+        {
+            string resp = "";
+            string claveHash = Seguridad.HashSHA256(oUsuario.Clave);
+            NpgsqlConnection SqlCon = new NpgsqlConnection();
+
+            try
+            {
+                SqlCon = Conexion.getInstancia().CrearConexion();
+                SqlCon.Open();
+
+                string Insert = "INSERT INTO usuario (nombre, usuario, clave, rol_id) " +
+                                "VALUES (@nombre, @usuario, @clave, @rol_id)";
+
+                NpgsqlCommand Comando = new NpgsqlCommand(Insert, SqlCon);
+                Comando.CommandType = CommandType.Text;
+                Comando.Parameters.AddWithValue("@nombre", oUsuario.Nombre);
+                Comando.Parameters.AddWithValue("@usuario", oUsuario.Usuario);
+                Comando.Parameters.AddWithValue("@clave", claveHash);
+                Comando.Parameters.AddWithValue("@rol_id", oUsuario.RolId);
+
+                resp = Comando.ExecuteNonQuery() >= 1 ? "OK" : "No se pudo registrar el usuario";
+            }
+            catch (Exception ex)
+            {
+                resp = ex.Message;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open) SqlCon.Close();
+            }
+
+            return resp;
+        }
+
+        public string ActualizarUsuario(E_Usuario oUsuario)
+        {
+            string resp = "";
+            string claveHash = Seguridad.HashSHA256(oUsuario.Clave);
+            NpgsqlConnection SqlCon = new NpgsqlConnection();
+
+            try
+            {
+                SqlCon = Conexion.getInstancia().CrearConexion();
+                SqlCon.Open();
+
+                string query = "UPDATE usuario SET nomnbre = @nombre, rol_id = @rol_id WHERE id = @id";
+
+                NpgsqlCommand Comando = new NpgsqlCommand(query, SqlCon);
+                Comando.CommandType = CommandType.Text;
+                Comando.Parameters.AddWithValue("@nombre", oUsuario.Nombre);
+                Comando.Parameters.AddWithValue("@rol_id", oUsuario.RolId);
+                Comando.Parameters.AddWithValue("@id", oUsuario.Id);
+
+                resp = Comando.ExecuteNonQuery() >= 1 ? "OK" : "No se pudo registrar el usuario";
+            }
+            catch (Exception ex)
+            {
+                resp = ex.Message;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open) SqlCon.Close();
+            }
+
+            return resp;
+        }
+
+        public string DesactivarUsuario(string idUsuario)
+        {
+            string resp = "";
+            NpgsqlConnection SqlCon = new NpgsqlConnection();
+
+            try
+            {
+                string query = "UPDATE usuario SET status = false WHERE id = '" + idUsuario + "'";
+                SqlCon = Conexion.getInstancia().CrearConexion();
+                NpgsqlCommand Comando = new NpgsqlCommand(query, SqlCon);
+                Comando.CommandType = CommandType.Text;
+                SqlCon.Open();
+                resp = Comando.ExecuteNonQuery() >= 1 ? "OK" : "No se pudo desactivar el rol";
+            }
+            catch (Exception ex)
+            {
+                resp = ex.Message;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open) SqlCon.Close();
+            }
+
+            return resp;
         }
 
     }
