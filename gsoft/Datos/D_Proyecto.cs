@@ -16,13 +16,48 @@ namespace gsoft.Datos
             NpgsqlDataReader Resultado;
             DataTable Tabla = new DataTable();
             NpgsqlConnection SqlCon = new NpgsqlConnection();
+
             try
             {
-                string query = "SELECT p.id as Id, p.nombre as Nombre, p.descripcion AS Descripcion, p.fecha_inicio AS Inicio, p.fecha_fin AS Fin, u.nombre AS Responsable, u.id AS ResponsableId FROM proyecto p INNER JOIN usuario u ON p.responsable_id = u.id WHERE p.status=true";
+                string query = @"
+            SELECT 
+                p.id AS Id,
+                p.nombre AS Nombre,
+                p.descripcion AS Descripcion,
+                p.fecha_inicio AS Inicio,
+                p.fecha_fin AS Fin,
+                u.nombre AS Responsable,
+                u.id AS ResponsableId,
+
+                -- Costo total del proyecto (solo tareas activas)
+                COALESCE(SUM(
+                    CASE WHEN t.status = true THEN t.horas * r.salario_hora ELSE 0 END
+                ), 0) AS Costo,
+
+                -- Porcentaje de tareas completadas (solo tareas activas)
+                COALESCE(
+                    ROUND(
+                        COUNT(*) FILTER (WHERE t.status = true AND t.estado = 'Completado')::decimal 
+                        / NULLIF(COUNT(*) FILTER (WHERE t.status = true), 0) * 100, 2
+                    ), 0
+                ) AS Porcentaje_Completado
+
+            FROM proyecto p
+            INNER JOIN usuario u ON p.responsable_id = u.id
+            LEFT JOIN tarea t ON t.proyecto_id = p.id
+            LEFT JOIN usuario ut ON t.responsable_id = ut.id
+            LEFT JOIN rol r ON ut.rol_id = r.id
+            WHERE p.status = true";
+
                 if (!string.IsNullOrEmpty(busqueda))
                 {
                     query += " AND p.nombre ILIKE '%" + busqueda + "%'";
                 }
+
+                query += @"
+            GROUP BY p.id, p.nombre, p.descripcion, p.fecha_inicio, p.fecha_fin, u.nombre, u.id
+            ORDER BY p.fecha_inicio DESC";
+
                 SqlCon = Conexion.getInstancia().CrearConexion();
                 NpgsqlCommand Comando = new NpgsqlCommand(query, SqlCon);
                 Comando.CommandType = CommandType.Text;

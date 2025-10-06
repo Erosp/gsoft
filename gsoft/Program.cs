@@ -16,7 +16,8 @@ namespace gsoft
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Forms.FrmAppBase());
+            //Application.Run(new Forms.FrmAppBase());
+            Application.Run(new Forms.FrmLogin());
         }
     }
 }

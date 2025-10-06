@@ -16,13 +16,36 @@ namespace gsoft.Datos
             NpgsqlDataReader Resultado;
             DataTable Tabla = new DataTable();
             NpgsqlConnection SqlCon = new NpgsqlConnection();
+
             try
             {
-                string query = "SELECT t.id as Id, t.nombre as Nombre, t.descripcion AS Descripcion, t.fecha_limite AS Limite, t.prioridad AS Prioridad, t.estado AS Estado, t.horas AS Horas, u.nombre AS Responsable, u.id AS ResponsableId FROM tarea t INNER JOIN usuario u ON t.responsable_id = u.id WHERE t.status=true AND t.proyecto_id='" + idProyecto + "'";
+                string query = @"
+            SELECT 
+                t.id AS Id,
+                t.nombre AS Nombre,
+                t.descripcion AS Descripcion,
+                t.fecha_limite AS Limite,
+                t.prioridad AS Prioridad,
+                t.estado AS Estado,
+                t.horas AS Horas,
+                u.nombre AS Responsable,
+                u.id AS ResponsableId,
+
+                -- Costo por tarea
+                COALESCE(t.horas * r.salario_hora, 0) AS Costo
+
+            FROM tarea t
+            INNER JOIN usuario u ON t.responsable_id = u.id
+            LEFT JOIN rol r ON u.rol_id = r.id
+            WHERE t.status = true AND t.proyecto_id = '" + idProyecto + "'";
+
                 if (!string.IsNullOrEmpty(busqueda))
                 {
                     query += " AND t.nombre ILIKE '%" + busqueda + "%'";
                 }
+
+                query += " ORDER BY t.fecha_limite ASC";
+
                 SqlCon = Conexion.getInstancia().CrearConexion();
                 NpgsqlCommand Comando = new NpgsqlCommand(query, SqlCon);
                 Comando.CommandType = CommandType.Text;
