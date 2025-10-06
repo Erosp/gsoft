@@ -49,10 +49,9 @@ namespace gsoft.Forms
                 oUsuario = Datos.Login(txtUsuario.Text, txtClave.Text);
                 if (oUsuario != null)
                 {
-                    MessageBox.Show("Entro", "Entro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    //FrmPrincipal frmPrincipal = new FrmPrincipal(oUsuario);
-                    //this.Hide();
-                    //frmPrincipal.Show();
+                    FrmAppBase frmAppBase = new FrmAppBase();
+                    this.Hide();
+                    frmAppBase.Show();
                 }
                 else
                 {

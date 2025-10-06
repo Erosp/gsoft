@@ -46,7 +46,7 @@ namespace gsoft.Forms
             this.WindowState = FormWindowState.Minimized;
         }
 
-        private void abrirHijo(object formHijo)
+        public void abrirHijo(object formHijo)
         {
             if (this.panelContent.Controls.Count > 0)
                 this.panelContent.Controls.RemoveAt(0);

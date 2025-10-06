@@ -95,10 +95,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Datos\Conexion.cs" />
+    <Compile Include="Datos\D_Proyecto.cs" />
     <Compile Include="Datos\D_Rol.cs" />
+    <Compile Include="Datos\D_Tarea.cs" />
     <Compile Include="Datos\D_Usuario.cs" />
     <Compile Include="Datos\Seguridad.cs" />
+    <Compile Include="Entidades\E_Proyecto.cs" />
     <Compile Include="Entidades\E_Rol.cs" />
+    <Compile Include="Entidades\E_Tarea.cs" />
     <Compile Include="Entidades\E_Usuario.cs" />
     <Compile Include="Forms\FrmAppBase.cs">
       <SubType>Form</SubType>
@@ -130,6 +134,12 @@
     <Compile Include="Forms\Modulos\FrmRoles.Designer.cs">
       <DependentUpon>FrmRoles.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Modulos\FrmTareas.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Modulos\FrmTareas.Designer.cs">
+      <DependentUpon>FrmTareas.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Modulos\FrmUsuarios.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -152,6 +162,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Modulos\FrmRoles.resx">
       <DependentUpon>FrmRoles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Modulos\FrmTareas.resx">
+      <DependentUpon>FrmTareas.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Modulos\FrmUsuarios.resx">
       <DependentUpon>FrmUsuarios.cs</DependentUpon>
@@ -200,6 +213,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\borrar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tareas.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets" Condition="Exists('..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets')" />

@@ -150,9 +150,9 @@ namespace gsoft.Datos
                 Comando.Parameters.AddWithValue("@nombre", oUsuario.Nombre);
                 Comando.Parameters.AddWithValue("@usuario", oUsuario.Usuario);
                 Comando.Parameters.AddWithValue("@clave", claveHash);
-                Comando.Parameters.AddWithValue("@rol_id", oUsuario.RolId);
+                Comando.Parameters.AddWithValue("@rol_id", Guid.Parse(oUsuario.RolId.ToString()));
 
-                resp = Comando.ExecuteNonQuery() >= 1 ? "OK" : "No se pudo registrar el usuario";
+                resp = Comando.ExecuteNonQuery() >= 1 ? "OK" : "No se pudo crear el usuario";
             }
             catch (Exception ex)
             {
@@ -169,7 +169,6 @@ namespace gsoft.Datos
         public string ActualizarUsuario(E_Usuario oUsuario)
         {
             string resp = "";
-            string claveHash = Seguridad.HashSHA256(oUsuario.Clave);
             NpgsqlConnection SqlCon = new NpgsqlConnection();
 
             try
@@ -177,15 +176,15 @@ namespace gsoft.Datos
                 SqlCon = Conexion.getInstancia().CrearConexion();
                 SqlCon.Open();
 
-                string query = "UPDATE usuario SET nomnbre = @nombre, rol_id = @rol_id WHERE id = @id";
+                string query = "UPDATE usuario SET nombre = @nombre, rol_id = @rol_id WHERE id = @id";
 
                 NpgsqlCommand Comando = new NpgsqlCommand(query, SqlCon);
                 Comando.CommandType = CommandType.Text;
                 Comando.Parameters.AddWithValue("@nombre", oUsuario.Nombre);
-                Comando.Parameters.AddWithValue("@rol_id", oUsuario.RolId);
-                Comando.Parameters.AddWithValue("@id", oUsuario.Id);
+                Comando.Parameters.AddWithValue("@rol_id", Guid.Parse(oUsuario.RolId.ToString()));
+                Comando.Parameters.AddWithValue("@id", Guid.Parse(oUsuario.Id.ToString()));
 
-                resp = Comando.ExecuteNonQuery() >= 1 ? "OK" : "No se pudo registrar el usuario";
+                resp = Comando.ExecuteNonQuery() >= 1 ? "OK" : "No se pudo actualizar el usuario";
             }
             catch (Exception ex)
             {
@@ -211,7 +210,7 @@ namespace gsoft.Datos
                 NpgsqlCommand Comando = new NpgsqlCommand(query, SqlCon);
                 Comando.CommandType = CommandType.Text;
                 SqlCon.Open();
-                resp = Comando.ExecuteNonQuery() >= 1 ? "OK" : "No se pudo desactivar el rol";
+                resp = Comando.ExecuteNonQuery() >= 1 ? "OK" : "No se pudo desactivar el usuario";
             }
             catch (Exception ex)
             {

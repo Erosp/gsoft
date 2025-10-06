@@ -42,6 +42,9 @@ namespace gsoft.Forms
                     txtNombre.Text = "";
                     txtUsuario.Text = "";
                     txtClave.Text = "";
+                    FrmLogin frmLogin = new FrmLogin();
+                    this.Hide();
+                    frmLogin.Show();
                 }
                 else
                 {

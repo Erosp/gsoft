@@ -106,7 +106,7 @@ namespace gsoft.Forms.Modulos
 
             string id = fila.Cells["Id"].Value?.ToString();
             string nombreUsuario = fila.Cells["Nombre"].Value?.ToString();
-            string usuario = fila.Cells["Usuarios"].Value?.ToString();
+            string usuario = fila.Cells["Usuario"].Value?.ToString();
             string rol = fila.Cells["RolId"].Value?.ToString();
 
             if (columna == "Editar")
@@ -187,6 +187,11 @@ namespace gsoft.Forms.Modulos
                     MessageBox.Show(resp, "Error al actualizar", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void textBuscar_KeyUp(object sender, KeyEventArgs e)
+        {
+            ListarUsuarios(textBuscar.Text);
         }
     }
 }
