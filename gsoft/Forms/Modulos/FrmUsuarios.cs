@@ -35,6 +35,7 @@ namespace gsoft.Forms.Modulos
                 tablaUsuarios.DataSource = Datos.ListarUsuarios(busqueda);
                 tablaUsuarios.Columns["Id"].Visible = false;
                 tablaUsuarios.Columns["RolId"].Visible = false;
+                tablaUsuarios.Columns["Ver"].DisplayIndex = tablaUsuarios.Columns.Count - 1;
                 tablaUsuarios.Columns["Editar"].DisplayIndex = tablaUsuarios.Columns.Count - 1;
                 tablaUsuarios.Columns["Eliminar"].DisplayIndex = tablaUsuarios.Columns.Count - 1;
             }
@@ -121,6 +122,11 @@ namespace gsoft.Forms.Modulos
                 btnActualizar.Visible = true;
                 btnActualizar.Tag = id;
                 btnCancelar.Visible = true;
+            }
+            else if (columna == "Ver")
+            {
+                FrmAppBase padre = Application.OpenForms["FrmAppBase"] as FrmAppBase;
+                padre?.abrirHijo(new FrmDetallesUsuario(id, nombreUsuario));
             }
             else if (columna == "Eliminar")
             {

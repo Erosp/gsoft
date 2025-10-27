@@ -131,6 +131,60 @@ namespace gsoft.Datos
             }
         }
 
+        public DataTable ListarTotalDetalles(string idUsuario)
+        {
+            NpgsqlDataReader Resultado;
+            DataTable Tabla = new DataTable();
+            NpgsqlConnection SqlCon = new NpgsqlConnection();
+            try
+            {
+                string query = "SELECT u.id AS usuario_id, COUNT(DISTINCT t.proyecto_id) AS total_proyectos, SUM(t.horas) AS total_horas, SUM(t.horas) * r.salario_hora AS total_ingreso FROM usuario u JOIN rol r ON u.rol_id = r.id JOIN tarea t ON t.responsable_id = u.id WHERE u.id = '" + idUsuario + "' GROUP BY u.id, r.salario_hora;";
+                
+                SqlCon = Conexion.getInstancia().CrearConexion();
+                NpgsqlCommand Comando = new NpgsqlCommand(query, SqlCon);
+                Comando.CommandType = CommandType.Text;
+                SqlCon.Open();
+                Resultado = Comando.ExecuteReader();
+                Tabla.Load(Resultado);
+                return Tabla;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open) SqlCon.Close();
+            }
+        }
+
+        public DataTable ListarDetallesUsuario(string idUsuario)
+        {
+            NpgsqlDataReader Resultado;
+            DataTable Tabla = new DataTable();
+            NpgsqlConnection SqlCon = new NpgsqlConnection();
+            try
+            {
+                string query = "SELECT p.nombre AS proyecto_nombre, SUM(t.horas) AS horas_asignadas, SUM(t.horas) * r.salario_hora AS ingreso_proyecto FROM usuario u JOIN rol r ON u.rol_id = r.id JOIN tarea t ON t.responsable_id = u.id JOIN proyecto p ON t.proyecto_id = p.id WHERE u.id = '" + idUsuario + "' GROUP BY p.id, p.nombre, r.salario_hora;";
+
+                SqlCon = Conexion.getInstancia().CrearConexion();
+                NpgsqlCommand Comando = new NpgsqlCommand(query, SqlCon);
+                Comando.CommandType = CommandType.Text;
+                SqlCon.Open();
+                Resultado = Comando.ExecuteReader();
+                Tabla.Load(Resultado);
+                return Tabla;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (SqlCon.State == ConnectionState.Open) SqlCon.Close();
+            }
+        }
+
         public string CrearUsuario(E_Usuario oUsuario)
         {
             string resp = "";

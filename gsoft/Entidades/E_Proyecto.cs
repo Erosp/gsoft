@@ -14,5 +14,6 @@ namespace gsoft.Entidades
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
         public string ResponsableId { get; set; }
+        public decimal CostoInicial { get; set; }
     }
 }

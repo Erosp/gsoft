@@ -28,11 +28,12 @@ namespace gsoft.Datos
                 p.fecha_fin AS Fin,
                 u.nombre AS Responsable,
                 u.id AS ResponsableId,
+                p.costo_inicial AS Costo_Inicial,
 
                 -- Costo total del proyecto (solo tareas activas)
                 COALESCE(SUM(
                     CASE WHEN t.status = true THEN t.horas * r.salario_hora ELSE 0 END
-                ), 0) AS Costo,
+                ), 0) AS Costo_Real,
 
                 -- Porcentaje de tareas completadas (solo tareas activas)
                 COALESCE(
@@ -86,8 +87,8 @@ namespace gsoft.Datos
                 SqlCon = Conexion.getInstancia().CrearConexion();
                 SqlCon.Open();
 
-                string Insert = "INSERT INTO proyecto (nombre, descripcion, fecha_inicio, fecha_fin, responsable_id) " +
-                                "VALUES (@nombre, @descripcion, @fecha_inicio, @fecha_fin, @responsable_id)";
+                string Insert = "INSERT INTO proyecto (nombre, descripcion, fecha_inicio, fecha_fin, responsable_id, costo_inicial) " +
+                                "VALUES (@nombre, @descripcion, @fecha_inicio, @fecha_fin, @responsable_id, @costo_inicial)";
 
                 NpgsqlCommand Comando = new NpgsqlCommand(Insert, SqlCon);
                 Comando.CommandType = CommandType.Text;
@@ -96,6 +97,7 @@ namespace gsoft.Datos
                 Comando.Parameters.AddWithValue("@fecha_inicio", oProyecto.FechaInicio);
                 Comando.Parameters.AddWithValue("@fecha_fin", oProyecto.FechaFin);
                 Comando.Parameters.AddWithValue("@responsable_id", Guid.Parse(oProyecto.ResponsableId.ToString()));
+                Comando.Parameters.AddWithValue("@costo_inicial", oProyecto.CostoInicial);
 
                 resp = Comando.ExecuteNonQuery() >= 1 ? "OK" : "No se pudo crear el proyecto";
             }
@@ -121,7 +123,7 @@ namespace gsoft.Datos
                 SqlCon = Conexion.getInstancia().CrearConexion();
                 SqlCon.Open();
 
-                string query = "UPDATE proyecto SET nombre = @nombre, descripcion = @descripcion, fecha_inicio = @fecha_inicio, fecha_fin = @fecha_fin, responsable_id = @responsable_id WHERE id = @id";
+                string query = "UPDATE proyecto SET nombre = @nombre, descripcion = @descripcion, fecha_inicio = @fecha_inicio, fecha_fin = @fecha_fin, responsable_id = @responsable_id, costo_inicial = @costo_inicial WHERE id = @id";
 
                 NpgsqlCommand Comando = new NpgsqlCommand(query, SqlCon);
                 Comando.CommandType = CommandType.Text;
@@ -130,6 +132,7 @@ namespace gsoft.Datos
                 Comando.Parameters.AddWithValue("@fecha_inicio", oProyecto.FechaInicio);
                 Comando.Parameters.AddWithValue("@fecha_fin", oProyecto.FechaFin);
                 Comando.Parameters.AddWithValue("@responsable_id", Guid.Parse(oProyecto.ResponsableId.ToString()));
+                Comando.Parameters.AddWithValue("@costo_inicial", oProyecto.CostoInicial);
                 Comando.Parameters.AddWithValue("@id", Guid.Parse(oProyecto.Id.ToString()));
 
                 resp = Comando.ExecuteNonQuery() >= 1 ? "OK" : "No se pudo actualizar el proyecto";

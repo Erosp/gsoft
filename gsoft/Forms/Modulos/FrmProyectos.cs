@@ -25,6 +25,7 @@ namespace gsoft.Forms.Modulos
             txtDescripcion.Clear();
             dtpFechaInicio.Value = DateTime.Now;
             dtpFechaFin.Value = DateTime.Now;
+            txtCostoInicial.Clear();
             cbxResponsable.SelectedIndex = -1; // No seleccionar ningún responsable
         }
 
@@ -90,6 +91,16 @@ namespace gsoft.Forms.Modulos
                 oProyecto.FechaFin = dtpFechaFin.Value;
                 oProyecto.Descripcion = txtDescripcion.Text;
 
+                decimal costo;
+                if (decimal.TryParse(txtCostoInicial.Text, out costo))
+                {
+                    oProyecto.CostoInicial = costo;
+                }
+                else
+                {
+                    MessageBox.Show("Por favor, introduzca un costo inicial correcto.", "Costo Inicial invalido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+
                 D_Proyecto Datos = new D_Proyecto();
                 resp = Datos.CrearProyecto(oProyecto);
                 if (resp.Equals("OK"))
@@ -118,6 +129,7 @@ namespace gsoft.Forms.Modulos
             string fechaInicio = fila.Cells["Inicio"].Value?.ToString();
             string fechaFin = fila.Cells["Fin"].Value?.ToString();
             string responsable = fila.Cells["ResponsableId"].Value?.ToString();
+            string costoInicial = fila.Cells["Costo_Inicial"].Value?.ToString();
 
             if (columna == "Editar")
             {
@@ -125,6 +137,7 @@ namespace gsoft.Forms.Modulos
                 txtDescripcion.Text = descripcion;
                 dtpFechaInicio.Value = DateTime.Parse(fechaInicio);
                 dtpFechaFin.Value = DateTime.Parse(fechaFin);
+                txtCostoInicial.Text = costoInicial;
                 cbxResponsable.SelectedValue = responsable;
                 btnCrear.Visible = false;
                 btnActualizar.Visible = true;
@@ -187,6 +200,16 @@ namespace gsoft.Forms.Modulos
                 oProyecto.FechaFin = dtpFechaFin.Value;
                 oProyecto.ResponsableId = cbxResponsable.SelectedValue.ToString();
                 oProyecto.Id = btnActualizar.Tag.ToString();
+
+                decimal costo;
+                if (decimal.TryParse(txtCostoInicial.Text, out costo))
+                {
+                    oProyecto.CostoInicial = costo;
+                }
+                else
+                {
+                    MessageBox.Show("Por favor, introduzca un costo inicial correcto.", "Costo Inicial invalido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
 
                 D_Proyecto Datos = new D_Proyecto();
                 resp = Datos.ActualizarProyecto(oProyecto);
